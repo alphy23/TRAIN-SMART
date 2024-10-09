@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}  Trainer Details| {% endblock %}
+
+{% block content %}
+
+<center>
+
+    <form method="post">
+        {% csrf_token %}
+        {% load widget_tweaks %}
+      
+        {% for a in form %}
+    
+                <div class="form-group">
+    
+                    {{ a.label }} {% render_field a class="form-control" id="name" placeholder=a.label required="required" %}
+                </div>
+                {% endfor %}
+    <input type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" value="Create">
+    </form>
+
+</center>
+{% endblock %}

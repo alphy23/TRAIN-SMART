@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}  Trainer Details| {{trainer.name}}{% endblock %}
+
+{% block content %}
+
+<center>
+
+    <div class="flex items-center justify-center flex-col max-w-md p-6 bg-white dark:text-gray-100">
+        <!-- ... rest of the code ... --><div class="flex flex-col max-w-md p-6 dark:bg-white dark:text-gray-100">
+        <img src="{{trainer.image}}" alt="" class="flex-shrink-0 object-cover h-64 rounded-sm sm:h-96 dark:bg-gray-500 aspect-square">
+        <div>
+            <h2 class="text-xl font-semibold">{{trainer.name}}</h2>
+            <span class="block pb-2 text-sm dark:text-gray-400">{{trainer.field}}</span>
+            <span class="block pb-2 text-sm dark:text-gray-400">{{trainer.comments}}</span>
+
+            {%for i in sessions%}
+            <span class="block pb-2 text-sm dark:text-gray-400">Cource: {{i.course}}</span>
+            <span class="block pb-2 text-sm dark:text-gray-400">Certification : {{i.certification}}</span>
+            {%endfor%}
+            
+            <h3 class="text-xl font-semibold">Training Schedules</h3>
+            
+                {%for i in training%}
+                
+                {%if i.status %}
+                <div class="border-solid border-2 border-sky-500 bg-cyan-500"> 
+                
+                
+                    <span class="bg-cyan-500">{{i.start_time}}-{{i.end_time}}</span> 
+
+                </div>
+                {%else%}
+                {%if i.bSomeoneElse%}
+                <div class="border-solid border-2 border-sky-500 bg-cyan-500"> 
+                
+                    <span class="bg-cyan-500">{{i.start_time}}-{{i.end_time}}</span> 
+
+                </div>
+
+                {%else %}
+
+                <div class="border-solid border-2 border-sky-500 bg-red-400"> 
+                  <a href="/subscribeSession/{{i.id}}">{{i.start_time}}-{{i.end_time}}</a></span> 
+                </div>
+                {%endif%}
+                {%endif%}
+                <br>
+                {%endfor%}
+            
+
+        </div>
+    </div>
+    </div>
+
+</center>
+{% endblock %}

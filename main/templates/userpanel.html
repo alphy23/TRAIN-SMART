@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% block title %}  {{ request.user.first_name }} {{ request.user.last_name }} | User Panel | {% endblock %}
+
+{% block content %}
+
+
+<section  class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-4 py-12">
+
+
+<div>
+
+    <div id="form" class="grid w-full grid-cols-6 gap-2 bg-white px-4 py-5 sm:p-6">
+
+    
+        <div class="col-span-3">
+          <label class="label-text required text-sm font-medium text-white-700" for="form_rootPath">Age</label>
+    
+          <input type="text" id="age"  required="required" class="shadow appearance-none border rounded w-full py-2 px-3 text-white-700 leading-tight focus:outline-none focus:shadow-outline mt-1" />
+        </div>
+        <div class="col-span-3">
+            <label class="label-text required text-sm font-medium text-white-700" for="form_rootPath">Height</label>
+      
+            <input type="text" id="height"  required="required" class="shadow appearance-none border rounded w-full py-2 px-3 text-white-700 leading-tight focus:outline-none focus:shadow-outline mt-1" />
+          </div>
+          <div class="col-span-3">
+            <label class="label-text required text-sm font-medium text-white-700" for="form_rootPath">Weight</label>
+      
+            <input type="text" id="weight"  required="required" class="shadow appearance-none border rounded w-full py-2 px-3 text-white-700 leading-tight focus:outline-none focus:shadow-outline mt-1" />
+          </div>
+          <div class="col-span-6">
+            <label class="label-text required text-sm font-medium text-white-700" for="form_rootPath">BMI</label>
+      
+            <input type="text" id="bmi"  required="required" class="shadow appearance-none border rounded w-full py-2 px-3 text-white-700 leading-tight focus:outline-none focus:shadow-outline mt-1" />
+          </div>
+        <div class="col-span-6">
+          <button type="submit" id="form_save" name="form[save]" class="btn btn-primary" onclick=calculateBMI()>Update Details</button>
+        </div>
+<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white" id="type">Top students:</h2><br>
+
+      </div>
+<br>
+
+</div>
+<div id="healthPlans" class="grid w-full grid-cols-6 gap-2 bg-white px-4 py-5 sm:p-6"> 
+   <p>
+    Diet plans</p>
+    <ul class="space-y-4 text-left text-gray-500 dark:text-gray-400" id="myList">
+        <span>Follow the diet plans corresponds to the BMI</span>
+        
+    </ul>
+</div>
+
+</section>
+
+<script>
+var csrftoken = '{{ csrf_token }}';
+function FetchBMIDetails(){
+    var xhr = new XMLHttpRequest();  // Create a new XMLHttpRequest object
+            var url = "{% url 'getBMI' %}";  // Replace 'your_django_url_name' with your Django URL name
+
+            xhr.open('GET', url, true);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {  // Check if the request was successful
+                    var obj = JSON.parse(xhr.responseText);
+                    console.log(obj); 
+                    document.getElementById('age').value = obj.age
+                    document.getElementById('height').value = obj.height
+                    document.getElementById('weight').value = obj.weight
+                    document.getElementById('bmi').value = obj.BMI
+                     // Output the response to the console
+                    // Handle the response data here
+                    printBMI()
+                }
+
+                
+            };
+
+            xhr.send();  // Send the request
+
+}
+FetchBMIDetails()
+
+function calculateBMI() {
+    var age = Number(document.getElementById('age').value);
+    var height = Number(document.getElementById('height').value);
+    var weight = Number(document.getElementById('weight').value);
+    var BMI = weight / ((height/100) ** 2);
+    document.getElementById('bmi').value = BMI
+    
+    // Make a POST request to the Django backend
+    fetch('/changeBMI/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken // Ensure you have a CSRF token
+        },
+        body: JSON.stringify({ age, height, weight })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // You can handle the response here
+        // Optionally, update the UI with the new BMI data
+
+
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+
+function printBMI(){
+var BMI = document.getElementById('bmi').value;
+if(BMI>18.5 && BMI<24.9){
+    document.getElementById("type").innerHTML = "Normal"
+    var diets = ['Your BMI is Normal. No additional Diet is required']
+ for (let i = 0; i < diets.length; i++) {
+    console.log(diets[i]);
+
+    const staticListItem = document.createElement("li");
+    staticListItem.classList.add("flex", "items-center", "space-x-3", "rtl:space-x-reverse");
+    staticListItem.innerHTML = `
+      <svg class="flex-shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+      </svg>
+      <span>${diets[i]}</span>
+    `;
+    
+    document.getElementById("myList").appendChild(staticListItem);
+}
+  }
+  else if(BMI>25.0 && BMI<29.9)
+  {
+    document.getElementById("type").innerHTML = "Overweight"
+ var diets = ['water','Fruits','Volumetrics diet','Quinoa','Whole grains']
+ for (let i = 0; i < diets.length; i++) {
+    console.log(diets[i]);
+
+    const staticListItem = document.createElement("li");
+    staticListItem.classList.add("flex", "items-center", "space-x-3", "rtl:space-x-reverse");
+    staticListItem.innerHTML = `
+      <svg class="flex-shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+      </svg>
+      <span>${diets[i]}</span>
+    `;
+    
+    document.getElementById("myList").appendChild(staticListItem);
+}
+
+
+  }
+
+  else{
+    document.getElementById("type").innerHTML = "Obese"
+
+    document.getElementById("type").innerHTML = "Overweight"
+    var diets = ['Plant oils (olive and other vegetable oils)','Fruits','Nuts, seeds, beans, and other healthful sources of protein (fish and poultry)','Vegetables (a colorful variety-not potatoes)','Whole fruits (not fruit juices)']
+     
+    for (let i = 0; i < diets.length; i++) {
+        console.log(diets[i]);
+
+        const staticListItem = document.createElement("li");
+        staticListItem.classList.add("flex", "items-center", "space-x-3", "rtl:space-x-reverse");
+        staticListItem.innerHTML = `
+          <svg class="flex-shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+          </svg>
+          <span>${diets[i]}</span>
+        `;
+        
+        document.getElementById("myList").appendChild(staticListItem);
+    }
+    
+
+  }
+
+}
+
+
+
+</script>
+
+
+<hr class="hr" />
+<!-- Trainer Selection -->
+
+
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-4 py-12">
+    <div class="flex flex-col items-center leading-7 text-center text-white border-0 border-white-200">
+        <h4 id="pricing"
+            class="box-border m-0 text-2xl font-semibold leading-tight tracking-tight text-white border-solid sm:text-4xl md:text-5xl">
+            Check our awesome Team Members
+        </h4>
+        <p class="box-border mt-2 text-xl text-white border-solid sm:text-2xl">
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {% for key, item in my_context.items %}
+
+
+
+    
+
+
+<div class="w-full bg-white rounded-lg sahdow-lg overflow-hidden flex flex-col md:flex-row">
+    <div class="w-full md:w-2/5 h-80">
+        <img class="object-center object-cover w-full h-full" src="{{ item.image }}" alt="photo">
+    </div>
+    <div class="w-full md:w-3/5 text-left p-6 md:p-4 space-y-2">
+        <p class="text-xl text-white-700 font-bold">{{ item.name }}</p>
+        <p class="text-base text-white-400 font-normal">{{ item.field }}</p>
+        <p class="text-base leading-relaxed text-white-500 font-normal">{{ item.comments }}
+            <p></p>
+        <a href="/getTrainerDetails/{{item.id}}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">View Details</a>
+
+        {% if item.subscribed %}
+        <a href="/subscribeTrainer/{{item.id}}"  class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Deselect</a>
+        {%else%}
+        <a href="/subscribeTrainer/{{item.id}}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Select</a>
+
+        {%endif%}
+
+        
+        
+    </div>
+</div>
+{% endfor %}
+</div>
+    
+</section>
+
+{% comment %} Plan Selection {% endcomment %}
+
+<section class="py-6 leading-7 text-white bg-black sm:py-12 md:py-16">
+    <div class="box-border px-4 mx-auto border-solid sm:px-6 md:px-6 lg:px-0 max-w-7xl">
+
+        <div class="flex flex-col items-center leading-7 text-center text-white border-0 border-white-200">
+            <h3 id="pricing"
+                class="box-border m-0 text-3xl font-semibold leading-tight tracking-tight text-white border-solid sm:text-4xl md:text-5xl">
+                Check our awesome Plans
+            </h3>
+            <p class="box-border mt-2 text-xl text-white border-solid sm:text-2xl">
+            </p>
+        </div>
+
+        
+        <div id="pricing"
+            class="grid grid-cols-3 gap-4 mt-4 leading-7 text-white border-0 border-white-200 sm:mt-6 sm:gap-6 md:mt-8 md:gap-0 lg:grid-cols-3">
+            
+          {% for key, i in subs.items %}
+            
+          <div
+          class="relative z-20 flex flex-col items-center max-w-md p-3 mx-auto my-0 bg-black border-4 border-blue-600 border-solid rounded-lg sm:p-6 md:px-8 md:py-16">
+          <h3
+              class="m-0 text-2xl font-semibold leading-tight tracking-tight text-white border-0 border-white-200 sm:text-3xl md:text-4xl">
+              {{ i.name }}
+          </h3>
+          <div class="flex items-end mt-6 leading-7 text-white border-0 border-white-200">
+              <p class="box-border m-0 text-6xl font-semibold leading-none border-solid">
+                  ${{ i.pricing }}
+              </p>
+              <p class="box-border m-0 border-solid" style="border-image: initial;">
+                  / month
+              </p>
+          </div>
+
+
+          <ul class="flex-1 p-0 mt-4 ml-5 leading-7 text-white border-0 border-white-200">
+            {%for n in i.services %}
+              <li class="inline-flex items-center block w-full mb-2 ml-5 font-semibold text-left border-solid">
+                  <svg class="w-5 h-5 mr-2 font-semibold leading-7 text-blue-600 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                      </path>
+                  </svg>
+                  {{n}}
+              </li>
+              {% endfor %}
+              <li class="inline-flex items-center block w-full mb-2 ml-5 font-semibold text-left border-solid">
+            
+             
+            </li>
+          </ul>
+            {% if i.subscribed %}
+          <a href="/showSubscriptions/{{key}}"
+              class="inline-flex justify-center w-full px-4 py-3 mt-8 font-sans text-sm leading-none text-center text-white no-underline bg-red-600 border rounded-md cursor-pointer hover:bg-red-700 hover:border-red-700 hover:text-white focus-within:bg-red-700 focus-within:border-red-700 focus-within:text-white sm:text-base md:text-lg">
+              Unsubscribe
+          
+            </a>
+            {% else %}
+            <a href="/showSubscriptions/{{key}}"
+            class="inline-flex justify-center w-full px-4 py-3 mt-8 font-sans text-sm leading-none text-center text-white no-underline bg-blue-600 border rounded-md cursor-pointer hover:bg-blue-700 hover:border-blue-700 hover:text-white focus-within:bg-blue-700 focus-within:border-blue-700 focus-within:text-white sm:text-base md:text-lg">
+            Start Now
+        </a>
+          {%endif%}
+
+
+      </div>
+        
+            {%endfor%}
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

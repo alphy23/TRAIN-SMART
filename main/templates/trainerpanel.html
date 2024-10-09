@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}  Trainer Details {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4 mb-4">
+    <div class="row">
+  
+      {% for i in trainer %}
+       
+      <div class="card" style="border-radius: 15px;">
+        <div class="card-body p-4">
+          <div class="d-flex text-black">
+            <div class="flex-shrink-0">
+              <img src="{{i.image}}"
+                alt="Generic placeholder image" class="img-fluid"
+                style="width: 180px; border-radius: 10px;">
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h5 class="mb-1">{{i.name}}</h5>
+              <p class="mb-2 pb-1" style="color: #2b2a2a;">{{i.field}}</p>
+              <p class="mb-2 pb-1" style="color: #2b2a2a;">{{i.comments}}</p>
+              <a href="/addCertification/" class="card-link">Add Certification</a>
+              <a href="/add_training_session/" class="card-link">Add Session</a>
+              
+            </div>
+          </div>
+        </div>
+  
+  
+      </div>
+      <hr class="hr" />
+  
+      {%endfor%}
+        
+        
+  
+  
+    </div>
+  </div>
+
+<center>
+
+
+  <section>
+    <div class="row">
+      <h3 class="text-white">Certifications</h3>
+        {%  for i in  sessions %}
+
+        <div class="col-md-4">
+
+
+            <div class="card" style="width: 18rem;">
+             
+                <div class="card-body">
+                    <h5 class="card-title">{{i.course}}</h5>
+                    <p class="card-text">{{i.certification}}</p>
+                    <a href="/deleteSession/{{i.id}}" class="btn btn-primary">Delete</a>
+                </div>
+            </div>
+        </div>
+
+{%endfor%}
+        
+
+
+    </div>
+</section>
+
+<br>
+
+<section>
+  <div class="row">
+    <h3 class="text-white">Training Sessions</h3>
+
+      {%  for i in  training_sessions %}
+
+      <div class="col-md-4">
+
+          <div class="card" style="width: 18rem;">
+           
+              <div class="card-body">
+                  <h5 class="card-title">Session Name : {{i.sessions}}</h5>
+                  <p class="card-text">Start Time: {{i.start_time}}</p>
+                  <p class="card-text">End Time: {{i.end_time}}</p>
+                  <p class="card-text">Subscribed User : {{i.user}}</p>
+                  <a href="/deleteSession1/{{i.id}}" class="btn btn-primary">Delete</a>
+              </div>
+          </div>
+      </div>
+
+{%endfor%}
+      
+
+
+  </div>
+</section>
+
+
+</center>
+
+<br>
+
+{% endblock %}
